@@ -3,7 +3,7 @@ services:
     name: sih264-backend
     runtime: node
     plan: free
-    buildCommand: npm install && npx prisma generate && npx prisma db push && node server/seed.js
+    buildCommand: npm install && npx prisma generate && npx prisma db push --accept-data-loss && node server/seed.js
     startCommand: node server/index.js
     envVars:
       - key: NODE_ENV
@@ -14,3 +14,4 @@ services:
         generateValue: true
       - key: PORT
         value: 10000
+
