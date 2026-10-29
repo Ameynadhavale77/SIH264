@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: sih264-backend
+    runtime: node
+    plan: free
+    buildCommand: npm install && npx prisma generate && npx prisma db push && node server/seed.js
+    startCommand: node server/index.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        value: file:./prisma/prod.db
+      - key: JWT_SECRET
+        generateValue: true
+      - key: PORT
+        value: 10000

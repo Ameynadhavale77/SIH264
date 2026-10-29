@@ -1,0 +1,189 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id           String        @id @default(uuid())
+  email        String        @unique
+  passwordHash String
+  name         String
+  role         String        @default("OFFICER")
+  department   String
+  region       String        @default("All")
+  avatar       String        @default("AICTE")
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  assignedComplaints Complaint[] @relation("AssignedOfficer")
+  actions            Action[]
+  auditLogs          AuditLog[]
+  notifications      Notification[]
+}
+
+model Institution {
+  id              String       @id @default(uuid())
+  aicteId         String       @unique
+  name            String
+  city            String
+  state           String
+  region          String
+  type            String
+  status          String       @default("Active")
+  contactEmail    String?
+  contactPhone    String?
+  approvalYear    String       @default("2026-2027")
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  complaints      Complaint[]
+  overlaps        Overlap[]
+}
+
+model Complaint {
+  id                 String       @id @default(uuid())
+  complaintNumber    String       @unique
+  institutionId      String
+  category           String
+  description        String       @db.Text
+  source             String       @default("Online Portal")
+  complainantType    String       @default("Student")
+  department         String
+  assignedOfficerId  String?
+  status             String       @default("NEW")
+  priority           String       @default("MEDIUM")
+  deadline           DateTime
+  filedDate          DateTime     @default(now())
+  resolvedDate       DateTime?
+  isOverdue          Boolean      @default(false)
+  createdAt          DateTime     @default(now())
+  updatedAt          DateTime     @updatedAt
+
+  institution        Institution  @relation(fields: [institutionId], references: [id], onDelete: Cascade)
+  assignedOfficer    User?        @relation("AssignedOfficer", fields: [assignedOfficerId], references: [id])
+  actions            Action[]
+  overlapsAsA        Overlap[]    @relation("ComplaintA")
+  overlapsAsB        Overlap[]    @relation("ComplaintB")
+}
+
+model Action {
+  id             String       @id @default(uuid())
+  complaintId    String
+  actionType     String
+  actionBy       String?
+  actionByName   String
+  fromDepartment String?
+  toDepartment   String?
+  remarks        String       @db.Text
+  attachmentUrl  String?
+  createdAt      DateTime     @default(now())
+
+  complaint      Complaint    @relation(fields: [complaintId], references: [id], onDelete: Cascade)
+  user           User?        @relation(fields: [actionBy], references: [id])
+}
+
+model Overlap {
+  id                 String       @id @default(uuid())
+  complaintAId       String
+  complaintBId       String
+  institutionId      String
+  matchType          String
+  similarityScore    Float
+  semanticScore      Float
+  categoryScore      Float
+  timelineDeltaDays  Int
+  departmentA        String
+  departmentB        String
+  status             String       @default("FLAGGED")
+  matchedSignals     String       @db.Text
+  differences        String       @db.Text
+  reviewedBy         String?
+  reviewedAt         DateTime?
+  createdAt          DateTime     @default(now())
+  updatedAt          DateTime     @updatedAt
+
+  complaintA         Complaint    @relation("ComplaintA", fields: [complaintAId], references: [id], onDelete: Cascade)
+  complaintB         Complaint    @relation("ComplaintB", fields: [complaintBId], references: [id], onDelete: Cascade)
+  institution        Institution  @relation(fields: [institutionId], references: [id], onDelete: Cascade)
+  coordinationRecord CoordinationRecord?
+}
+
+model CoordinationRecord {
+  id                   String       @id @default(uuid())
+  overlapId            String       @unique
+  leadBureau           String
+  participatingBureaus String       @db.Text
+  assignedOfficers     String       @db.Text
+  status               String       @default("ACTIVE")
+  jointDirective       String       @db.Text
+  nextActions          String?      @db.Text
+  deadline             DateTime?
+  createdAt            DateTime     @default(now())
+  updatedAt            DateTime     @updatedAt
+
+  overlap              Overlap      @relation(fields: [overlapId], references: [id], onDelete: Cascade)
+  actions              CoordinationAction[]
+}
+
+model CoordinationAction {
+  id                   String              @id @default(uuid())
+  coordinationRecordId String
+  actionType           String
+  officerId            String?
+  officerName          String
+  bureau               String
+  notes                String              @db.Text
+  createdAt            DateTime            @default(now())
+
+  coordinationRecord   CoordinationRecord  @relation(fields: [coordinationRecordId], references: [id], onDelete: Cascade)
+}
+
+model AuditLog {
+  id         String       @id @default(uuid())
+  userId     String?
+  userName   String       @default("System")
+  action     String
+  entityType String
+  entityId   String?
+  ipAddress  String?      @default("127.0.0.1")
+  details    String?      @db.Text
+  createdAt  DateTime     @default(now())
+
+  user       User?        @relation(fields: [userId], references: [id])
+}
+
+model Notification {
+  id                 String       @id @default(uuid())
+  userId             String
+  type               String
+  title              String
+  message            String       @db.Text
+  relatedComplaintId String?
+  relatedOverlapId   String?
+  isRead             Boolean      @default(false)
+  deliveryStatus     String       @default("DELIVERED")
+  createdAt          DateTime     @default(now())
+
+  user               User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model BenchmarkCase {
+  id                 String       @id @default(uuid())
+  pairKey            String       @unique
+  institutionName    String
+  departmentA        String
+  departmentB        String
+  categoryA          String
+  categoryB          String
+  descriptionA       String       @db.Text
+  descriptionB       String       @db.Text
+  groundTruthLabel   Boolean
+  predictedScore     Float?
+  predictedLabel     Boolean?
+  explanation        String       @db.Text
+  verifiedAt         DateTime     @default(now())
+}

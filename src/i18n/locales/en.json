@@ -1,0 +1,175 @@
+{
+  "app": {
+    "title": "AICTE Integrated Complaint & Overlap Tracking Portal",
+    "shortTitle": "AICTE Dashboard",
+    "subtitle": "Centralized Cross-Bureau Redressal & Intelligence",
+    "prototypeNotice": "PROPOSED SIH 2026 PROTOTYPE — AICTE PROBLEM STATEMENT 264 (RESEARCH & DEMONSTRATION ONLY)"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "complaints": "Complaints Repository",
+    "institutions": "Institutions Directory",
+    "overlaps": "Overlap Detection",
+    "coordination": "Case Coordination",
+    "caseNetwork": "Case Relationship Graph",
+    "reports": "Reports & Analytics",
+    "auditLogs": "Audit History",
+    "admin": "System & Benchmark",
+    "logout": "Logout"
+  },
+  "status": {
+    "NEW": "New",
+    "UNDER_REVIEW": "Under Review",
+    "UNDER_PROCESS": "Under Process",
+    "TRANSFERRED": "Transferred",
+    "ESCALATED": "Escalated",
+    "DISPOSED": "Disposed",
+    "CLOSED": "Closed",
+    "OVERDUE": "Overdue SLA",
+    "ON_TRACK": "On Track"
+  },
+  "priority": {
+    "LOW": "Low",
+    "MEDIUM": "Medium",
+    "HIGH": "High",
+    "CRITICAL": "Critical"
+  },
+  "overlapStatus": {
+    "FLAGGED": "Flagged",
+    "UNDER_REVIEW": "Under Joint Review",
+    "CONFIRMED": "Confirmed Overlap",
+    "DISMISSED": "Dismissed"
+  },
+  "bureau": {
+    "RB": "Regulation Bureau (RB)",
+    "PGRC": "Public Grievance Redressal Cell (PGRC)",
+    "Legal": "Legal Cell",
+    "Approval": "Approval Bureau",
+    "Regional Office": "Regional Office",
+    "Administration": "HQ Administration"
+  },
+  "dashboard": {
+    "title": "Integrated Complaint Monitoring Dashboard",
+    "subtitle": "Real-time oversight across AICTE bureaus, grievance cells, and regional directorates",
+    "totalComplaints": "Total Grievances",
+    "pendingComplaints": "Pending Scrutiny",
+    "overdueComplaints": "SLA Overdue",
+    "overlapsDetected": "Overlaps Flagged",
+    "disposedCases": "Disposed Cases",
+    "escalatedCases": "Escalated to HQ",
+    "disposalRate": "Disposal Efficiency Rate",
+    "overlapAlertTitle": "Potential Overlapping Cases — Cross-Bureau Coordination Required",
+    "overlapAlertDesc": "Parallel inquiries detected in multiple bureaus against identical technical institutions. Immediate joint review required.",
+    "reviewNow": "Review Cases",
+    "intakeTrend": "Monthly Grievance Intake vs Disposal Trend",
+    "bureauWorkload": "Grievance Workload by Department",
+    "statusDistribution": "Lifecycle Status Distribution",
+    "recentComplaints": "Recent Grievances Filed",
+    "caseId": "Case ID",
+    "institution": "Institution",
+    "category": "Category",
+    "bureau": "Bureau",
+    "priority": "Priority",
+    "statusLabel": "Status",
+    "filedDate": "Filed Date",
+    "action": "Action"
+  },
+  "complaints": {
+    "title": "Centralized Complaint Repository",
+    "subtitle": "Search, filter, track and reassign grievance files across AICTE bureaus",
+    "exportCSV": "Export Filtered CSV",
+    "searchPlaceholder": "Search by Case ID, AICTE ID, college name, keywords...",
+    "allBureaus": "All Bureaus",
+    "allStatuses": "All Statuses",
+    "allCategories": "All Categories",
+    "allPriorities": "All Priorities",
+    "overdueOnly": "Overdue Only",
+    "overlapsOnly": "Overlaps Only",
+    "clearFilters": "Clear",
+    "registerComplaint": "Register Grievance",
+    "showingResults": "Showing {{from}}-{{to}} of {{total}} grievance records",
+    "deadline": "SLA Target",
+    "officer": "Assigned Officer"
+  },
+  "detail": {
+    "backToList": "Back to Complaints",
+    "caseParticulars": "Case Particulars",
+    "institutionDetails": "Institution Details",
+    "viewInstitution": "View Full Profile",
+    "narrative": "Official Grievance Narrative",
+    "actionAuditTrail": "Action & Audit Trail",
+    "logAction": "Record Inter-Bureau Action",
+    "actionType": "Action Type",
+    "targetBureau": "Transfer To Bureau",
+    "remarks": "Official Remarks / Findings",
+    "submitAction": "Submit Action Entry",
+    "transferCase": "Transfer Case",
+    "overlapNotice": "Cross-Bureau Overlap Flagged: Case overlaps with parallel filing in {{dept}} Bureau."
+  },
+  "overlaps": {
+    "title": "Cross-Bureau Overlap Detection",
+    "subtitle": "Explainable multi-signal AI engine preventing duplicate inquiries across AICTE departments",
+    "howItWorks": "How Overlap Detection Works",
+    "scanDatabase": "Run Full Overlap Scan",
+    "evaluateBenchmark": "Benchmark Accuracy",
+    "similarityScore": "AI Overlap Score",
+    "matchedSignals": "Matched Evidentiary Signals",
+    "divergentPoints": "Divergent Case Dimensions",
+    "confirmOverlap": "Confirm Overlap",
+    "dismiss": "Dismiss (Distinct)",
+    "compareSideBySide": "Compare Cases Side-by-Side",
+    "actionRequired": "Action Required"
+  },
+  "coordination": {
+    "title": "Cross-Bureau Case Coordination",
+    "subtitle": "Shared inter-bureau coordination records, lead bureau designation, and joint directives",
+    "leadBureau": "Lead Coordinating Bureau",
+    "participating": "Participating Bureaus",
+    "jointDirective": "Joint Directive Memo",
+    "nextActions": "Scheduled Milestones",
+    "status": "Coordination Status",
+    "dispatchDirective": "Dispatch Joint Directive",
+    "jointInspection": "Order Joint Inspection Committee",
+    "mergeCases": "Consolidate Case Files",
+    "showCause": "Issue Harmonized Show-Cause"
+  },
+  "institutions": {
+    "title": "Accredited Institutions Directory",
+    "subtitle": "Registry of AICTE-approved engineering, management, pharmacy & technical colleges",
+    "aicteId": "Permanent AICTE ID",
+    "region": "Region",
+    "type": "Discipline",
+    "status": "Accreditation Status",
+    "totalGrievances": "Total Grievances",
+    "activeCases": "Active Grievances",
+    "overlaps": "Cross-Bureau Overlaps"
+  },
+  "reports": {
+    "title": "Statutory Reports & Grievance Analytics",
+    "subtitle": "Comprehensive institutional, regional, bureau-wise, and ageing compliance reports",
+    "bureauReport": "Bureau Performance Report",
+    "regionReport": "Regional Grievance Distribution",
+    "ageingReport": "SLA Ageing & Backlog Analysis",
+    "trendReport": "Quarterly Intake vs Disposal",
+    "exportReport": "Export Report CSV"
+  },
+  "caseNetwork": {
+    "title": "Case Relationship Intelligence Graph",
+    "subtitle": "Interactive network mapping institutions, active complaints, departments, and inter-bureau overlap bridges"
+  },
+  "audit": {
+    "title": "Official Consequential Action Log Trail",
+    "subtitle": "Immutable statutory log recording officer accountability, status transitions, and directives"
+  },
+  "common": {
+    "loading": "Loading AICTE Records...",
+    "save": "Save Changes",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "close": "Close",
+    "yes": "Yes",
+    "no": "No",
+    "search": "Search",
+    "filter": "Filter"
+  }
+}

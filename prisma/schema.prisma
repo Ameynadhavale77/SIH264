@@ -1,0 +1,191 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+
+
+model User {
+  id           String        @id @default(uuid())
+  email        String        @unique
+  passwordHash String
+  name         String
+  role         String        @default("OFFICER") // ADMIN, BUREAU_HEAD, OFFICER, VIEWER
+  department   String        // RB, PGRC, Legal, Approval, Regional Office, Administration
+  region       String        @default("All")     // North, South, East, West, Central, All
+  avatar       String        @default("AICTE")
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  assignedComplaints Complaint[] @relation("AssignedOfficer")
+  actions            Action[]
+  auditLogs          AuditLog[]
+  notifications      Notification[]
+}
+
+model Institution {
+  id              String       @id @default(uuid())
+  aicteId         String       @unique // Permanent AICTE ID e.g. AICTE-1-4527891234
+  name            String
+  city            String
+  state           String
+  region          String       // North, South, East, West, Central
+  type            String       // Engineering, MBA, Pharmacy, Architecture, MCA, Polytechnic
+  status          String       @default("Active") // Active, Suspended, Under Scrutiny
+  contactEmail    String?
+  contactPhone    String?
+  approvalYear    String       @default("2026-2027")
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  complaints      Complaint[]
+  overlaps        Overlap[]
+}
+
+model Complaint {
+  id                 String       @id @default(uuid())
+  complaintNumber    String       @unique // e.g. PGRC-2026-00001
+  institutionId      String
+  category           String       // Fee Related, Faculty Shortage, Ragging, Harassment, etc.
+  description        String
+  source             String       @default("Online Portal") // Online Portal, Email, Letter, Walk-in, CPGRAMS
+  complainantType    String       @default("Student")       // Student, Faculty, Parent, Staff, Anonymous
+  department         String       // RB, PGRC, Legal, Approval, Regional Office
+  assignedOfficerId  String?
+  status             String       @default("NEW")           // NEW, UNDER_REVIEW, UNDER_PROCESS, TRANSFERRED, ESCALATED, DISPOSED, CLOSED
+  priority           String       @default("MEDIUM")        // LOW, MEDIUM, HIGH, CRITICAL
+  deadline           DateTime
+  filedDate          DateTime     @default(now())
+  resolvedDate       DateTime?
+  isOverdue          Boolean      @default(false)
+  createdAt          DateTime     @default(now())
+  updatedAt          DateTime     @updatedAt
+
+  institution        Institution  @relation(fields: [institutionId], references: [id], onDelete: Cascade)
+  assignedOfficer    User?        @relation("AssignedOfficer", fields: [assignedOfficerId], references: [id])
+  actions            Action[]
+  overlapsAsA        Overlap[]    @relation("ComplaintA")
+  overlapsAsB        Overlap[]    @relation("ComplaintB")
+}
+
+model Action {
+  id             String       @id @default(uuid())
+  complaintId    String
+  actionType     String       // STATUS_CHANGE, REMARK, TRANSFER, ESCALATION, DOCUMENT_UPLOAD, RESOLUTION
+  actionBy       String?
+  actionByName   String
+  fromDepartment String?
+  toDepartment   String?
+  remarks        String
+  attachmentUrl  String?
+  createdAt      DateTime     @default(now())
+
+  complaint      Complaint    @relation(fields: [complaintId], references: [id], onDelete: Cascade)
+  user           User?        @relation(fields: [actionBy], references: [id])
+}
+
+model Overlap {
+  id                 String       @id @default(uuid())
+  complaintAId       String
+  complaintBId       String
+  institutionId      String
+  matchType          String       // SAME_INSTITUTION, CATEGORY_MATCH, SEMANTIC_SIMILARITY, ENTITY_MATCH
+  similarityScore    Float        // Composite score 0.00 - 1.00
+  semanticScore      Float        // NLP TF-IDF Cosine Similarity 0.00 - 1.00
+  categoryScore      Float        // Taxonomy match 0.00 - 1.00
+  timelineDeltaDays  Int          // Delta between filing dates
+  departmentA        String
+  departmentB        String
+  status             String       @default("FLAGGED") // FLAGGED, UNDER_REVIEW, CONFIRMED, DISMISSED
+  matchedSignals     String       // JSON string of matching factors
+  differences        String       // JSON string of differences
+  reviewedBy         String?
+  reviewedAt         DateTime?
+  createdAt          DateTime     @default(now())
+  updatedAt          DateTime     @updatedAt
+
+  complaintA         Complaint    @relation("ComplaintA", fields: [complaintAId], references: [id], onDelete: Cascade)
+  complaintB         Complaint    @relation("ComplaintB", fields: [complaintBId], references: [id], onDelete: Cascade)
+  institution        Institution  @relation(fields: [institutionId], references: [id], onDelete: Cascade)
+  coordinationRecord CoordinationRecord?
+}
+
+model CoordinationRecord {
+  id                   String       @id @default(uuid())
+  overlapId            String       @unique
+  leadBureau           String       // RB, PGRC, Legal
+  participatingBureaus String       // JSON array of bureaus
+  assignedOfficers     String       // JSON array of officer names/IDs
+  status               String       @default("ACTIVE") // ACTIVE, JOINT_INQUIRY, RESOLVED, CLOSED
+  jointDirective       String
+  nextActions          String?      // JSON array of action items
+  deadline             DateTime?
+  createdAt            DateTime     @default(now())
+  updatedAt            DateTime     @updatedAt
+
+  overlap              Overlap      @relation(fields: [overlapId], references: [id], onDelete: Cascade)
+  actions              CoordinationAction[]
+}
+
+model CoordinationAction {
+  id                   String              @id @default(uuid())
+  coordinationRecordId String
+  actionType           String              // DIRECTIVE_ISSUED, JOINT_INSPECTION_SCHEDULED, SHOW_CAUSE_ISSUED, COMPLIANCE_RECEIVED, CASE_MERGED
+  officerId            String?
+  officerName          String
+  bureau               String
+  notes                String
+  createdAt            DateTime            @default(now())
+
+  coordinationRecord   CoordinationRecord  @relation(fields: [coordinationRecordId], references: [id], onDelete: Cascade)
+}
+
+model AuditLog {
+  id         String       @id @default(uuid())
+  userId     String?
+  userName   String       @default("System")
+  action     String       // LOGIN, STATUS_UPDATE, TRANSFER, OVERLAP_CONFIRM, OVERLAP_DISMISS, JOINT_DIRECTIVE, EXPORT_REPORT
+  entityType String       // COMPLAINT, INSTITUTION, OVERLAP, COORDINATION, USER
+  entityId   String?
+  ipAddress  String?      @default("127.0.0.1")
+  details    String?      // JSON string of context details
+  createdAt  DateTime     @default(now())
+
+  user       User?        @relation(fields: [userId], references: [id])
+}
+
+model Notification {
+  id                 String       @id @default(uuid())
+  userId             String
+  type               String       // OVERLAP_ALERT, DEADLINE_WARNING, ESCALATION, TRANSFER_NOTICE, JOINT_DIRECTIVE
+  title              String
+  message            String
+  relatedComplaintId String?
+  relatedOverlapId   String?
+  isRead             Boolean      @default(false)
+  deliveryStatus     String       @default("DELIVERED") // PENDING, DELIVERED, READ
+  createdAt          DateTime     @default(now())
+
+  user               User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model BenchmarkCase {
+  id                 String       @id @default(uuid())
+  pairKey            String       @unique
+  institutionName    String
+  departmentA        String
+  departmentB        String
+  categoryA          String
+  categoryB          String
+  descriptionA       String
+  descriptionB       String
+  groundTruthLabel   Boolean      // true = Genuine Overlap, false = Non-overlap
+  predictedScore     Float?
+  predictedLabel     Boolean?
+  explanation        String
+  verifiedAt         DateTime     @default(now())
+}
